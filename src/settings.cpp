@@ -6,8 +6,8 @@
 #include <vector>
 #include <map>
 #include <filesystem>
-
 #include "picojson\picojson.h"
+#include "settings.h"
 
 
 // truncated name warning
@@ -39,10 +39,10 @@ inline static void ToLower(std::string & str)
 }
 
 
-static std::string ToString(UInt32 id)
+static std::string ToString(uint32_t id)
 {
-	DataHandler *dhnd = DataHandler::GetSingleton();
-	UInt8 modIndex = id >> 24;
+	auto dhnd = RE::TESDataHandler::GetSingleton();
+	uint8_t modIndex = id >> 24;
 	if (modIndex >= dhnd->modList.loadedMods.count)
 		return std::string("XXXXXX");
 
@@ -54,7 +54,7 @@ static std::string ToString(UInt32 id)
 		ss << modName << " ";
 	}
 
-	for (UInt32 i = 0; i < dhnd->modList.loadedMods.count; ++i) {
+	for (uint32_t i = 0; i < dhnd->modList.loadedMods.count; ++i) {
 	}
 
 	ss << std::hex << std::setfill('0') << std::setw(6) << (id & 0x00FFFFFF);
@@ -69,7 +69,6 @@ static bool ParseJson(std::string jsonFileName, picojson::value &val)
 
 	if (!fileStream)
 	{
-		_MESSAGE("**** error **** cannot read JSON file: %s", jsonFileName.c_str());
 		return false;
 	}
 
@@ -78,12 +77,10 @@ static bool ParseJson(std::string jsonFileName, picojson::value &val)
 	std::string err = picojson::parse(val, ss);
 	if (!err.empty())
 	{
-		_MESSAGE("**** error **** invalid JSON in %s\n  %s", jsonFileName, err.c_str());
 		return false;
 	}
 	if (!val.is<picojson::object>())
 	{
-		_MESSAGE("**** error **** invalid top-level type in %s", jsonFileName);
 		return false;
 	}
 

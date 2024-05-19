@@ -1,6 +1,6 @@
 #include "log.h"
 #include "hook.h"
-
+#include "settings.h"
 
 void OnDataLoaded()
 {

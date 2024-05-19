@@ -1,42 +1,35 @@
-// #pragma once
-// #include <SimpleIni.h>
-// #include <nlohmann/json.hpp>
-// using json = nlohmann::json;
+#pragma once
 
 
 
+class Settings
+{
+public:
+    [[nodiscard]] static Settings *GetSingleton()
+    {
+        static Settings singleton;
+        return &singleton;
+    }
 
+    
 
-// class Settings
-// {
-// public:
-//     [[nodiscard]] static Settings *GetSingleton()
-//     {
-//         static Settings singleton;
-//         return &singleton;
-//     }
-
-//     json JSONSettings;
+    // static void InsertAttackDataRecords(RE::TESRace *race, event_map &events);
 
    
 
+    // json JSONSettings;
+    // void LoadGameSettings();
+    // void LoadINI(const wchar_t *a_path);
+    // void LoadJSON(const wchar_t *a_path);
+    // void LoadSettings();
 
+private:
+    Settings() = default;
+    Settings(const Settings &) = delete;
+    Settings(Settings &&) = delete;
 
+    ~Settings() = default;
 
-
-    
-//     void LoadGameSettings();
-//     void LoadINI(const wchar_t *a_path);
-//     void LoadJSON(const wchar_t *a_path);
-//     void LoadSettings();
-
-// private:
-//     Settings() = default;
-//     Settings(const Settings &) = delete;
-//     Settings(Settings &&) = delete;
-
-//     ~Settings() = default;
-
-//     Settings &operator=(const Settings &) = delete;
-//     Settings &operator=(Settings &&) = delete;
-// };
+    Settings &operator=(const Settings &) = delete;
+    Settings &operator=(Settings &&) = delete;
+};
