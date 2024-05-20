@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 class Settings
 {
 public:
@@ -11,7 +9,8 @@ public:
         return &singleton;
     }
 
-    
+    static void SetAttackData(RE::BGSAttackData *attackData, attackdata &data);
+    static void InsertAttackDataRecords(RE::TESRace* race, event_map &events);
 
     // static void InsertAttackDataRecords(RE::TESRace *race, event_map &events);
 

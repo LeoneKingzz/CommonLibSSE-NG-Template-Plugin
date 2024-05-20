@@ -10,6 +10,7 @@
 #include "settings.h"
 
 
+
 // truncated name warning
 #pragma warning(disable: 4503)
 
@@ -135,84 +136,90 @@ static void RemapJson(picojson::value &json, setting_map &setting)
 }
 
 
-static void SetAttackData(BGSAttackData* attackData, attackdata &data)
+void Settings::SetAttackData(RE::BGSAttackData* attackData, attackdata &data)
 {
 	for (auto &val : data)
 	{
 		std::string &valName = val.first;
 
-		_MESSAGE("    %s = %s", valName.c_str(), val.second.serialize().c_str());
-
 		if (valName == "damagemult") {
-			attackData->damageMult = val.second.get<double>();
+			attackData->data.attackChance = val.second.get<double>();
 		}
 		else if (valName == "attackchance") {
-			attackData->attackChance = val.second.get<double>();
+			attackData->data.attackChance = val.second.get<double>();
 		}
 		else if (valName == "attackangle") {
-			attackData->attackAngle = val.second.get<double>();
+			attackData->data.attackAngle = val.second.get<double>();
 		}
 		else if (valName == "strikeangle") {
-			attackData->strikeAngle = val.second.get<double>();
+			attackData->data.strikeAngle = val.second.get<double>();
 		}
 		else if (valName == "stagger") {
-			attackData->stagger = val.second.get<double>();
+			attackData->data.staggerOffset = val.second.get<double>();
 		}
 		else if (valName == "knockdown") {
-			attackData->knockdown = val.second.get<double>();
+			attackData->data.knockDown = val.second.get<double>();
 		}
 		else if (valName == "recoverytime") {
-			attackData->recoveryTime = val.second.get<double>();
+			attackData->data.recoveryTime = val.second.get<double>();
 		}
 		else if (valName == "staminamult") {
-			attackData->staminaMult = val.second.get<double>();
+			attackData->data.staminaMult = val.second.get<double>();
 		}
 		else if (valName == "ignoreweapon") {
-			attackData->flags.ignoreWeapon = val.second.get<bool>();
+			attackData->data.flags.get()<RE::AttackData::AttackFlag::kIgnoreWeapon>val.second.get<bool>();
 		}
 		else if (valName == "bashattack") {
-			attackData->flags.bashAttack = val.second.get<bool>();
+			attackData->data.flags.get()<RE::AttackData::AttackFlag::kBashAttack>val.second.get<bool>();
 		}
 		else if (valName == "powerattack") {
-			attackData->flags.powerAttack = val.second.get<bool>();
+			attackData->data.flags.get()<RE::AttackData::AttackFlag::kPowerAttack>val.second.get<bool>();
 		}
 		else if (valName == "leftattack") {
-			attackData->flags.leftAttack = val.second.get<bool>();
+			attackData->data.flags.get()<RE::AttackData::AttackFlag::kChargeAttack>val.second.get<bool>();
 		}
 		else if (valName == "rotatingattack") {
-			attackData->flags.rotatingAttack = val.second.get<bool>();
+			attackData->data.flags.get()<RE::AttackData::AttackFlag::kRotatingAttack>val.second.get<bool>();
 		}
 		else {
-			_MESSAGE("**** warning **** unknown record name \" %s \"", valName);
+			
 		}
 	}
 }
 
 
-static void InsertAttackDataRecords(TESRace* race, event_map &events)
+void Settings::InsertAttackDataRecords(RE::TESRace* race, event_map &events)
 {
 	for (auto &ev : events)
 	{
-		BSFixedString eventName(ev.first.c_str());
+		RE::BSFixedString eventName(ev.first.c_str());
 
-		BGSAttackDataMap * adm = (BGSAttackDataMap *)race->attackData.unk08.ptr;
-
-		BGSAttackData *attackData = adm->Get(eventName);
-
-		if (!attackData)
-		{
-			_MESSAGE("(NEW) %s::%s", race->editorId.c_str(), ev.first.c_str());
-			attackData = adm->Add(eventName);
-		}
-		else // being lazy here
-		{
-			_MESSAGE("%s::%s", race->editorId.c_str(), ev.first.c_str());
+		auto adm = race->attackDataMap.get();
+		auto attackData = (RE::BGSAttackData*)adm->attackDataMap.contains(eventName);
+		
+		if (!attackData) {
+			attackData = adm->attackDataMap.
 		}
 
-		if (attackData)
-		{
+		if (attackData) {
 			SetAttackData(attackData, ev.second);
 		}
+
+		// RE::BGSAttackDataPtr
+
+		// RE::BGSAttackDataMap *adm = race->faceRelatedData<RE::TESRace::FaceRelatedData::Morph::unk08>->As<RE::BGSAttackData>();
+
+		// RE::BSGAttackData *attackData = adm->Get(eventName);
+
+		// if (!attackData)
+		// {
+		// 	attackData = adm->Add(eventName);
+		// }
+
+		// if (attackData)
+		// {
+		// 	SetAttackData(attackData, ev.second);
+		// }
 	}
 }
 
@@ -244,11 +251,11 @@ static void InitAttackDataJson()
 	});
 }
 
-typedef bool(*_TESRaceLoadForm)(TESRace * race, int64_t unk1);
-RelocAddr<_TESRaceLoadForm> TESRaceOriginalLoadForm(0x00384BC0);
-RelocAddr<uintptr_t> vtbl_TESRaceLoadForm(0x015A30E8); // vtable[6]
+typedef bool(*_TESRaceLoadForm)(RE::TESRace * race, int64_t unk1);
+REL::Relocation<_TESRaceLoadForm> TESRaceOriginalLoadForm(0x00384BC0);
+REL::Relocation<uintptr_t> vtbl_TESRaceLoadForm(0x015A30E8); // vtable[6]
 
-bool HookedLoadForm(TESRace * race, int64_t unk1)
+bool HookedLoadForm(RE::TESRace * race, int64_t unk1)
 {
 
 	bool result = TESRaceOriginalLoadForm(race, unk1);
@@ -264,7 +271,7 @@ bool HookedLoadForm(TESRace * race, int64_t unk1)
 		return result;
 	}
 
-	BGSAttackDataMap * adm = (BGSAttackDataMap *)race->attackData.unk08.ptr;
+	RE::BGSAttackDataMap * adm = (RE::BGSAttackDataMap *)race->attackData.unk08.ptr;
 
 
 
@@ -339,3 +346,4 @@ extern "C" {
 	}
 };
 
+// == RE::AttackData::AttackFlag::kIgnoreWeapon);
