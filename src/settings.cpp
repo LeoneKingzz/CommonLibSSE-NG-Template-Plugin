@@ -194,16 +194,29 @@ void Settings::InsertAttackDataRecords(RE::TESRace* race, event_map &events)
 	{
 		RE::BSFixedString eventName(ev.first.c_str());
 
-		auto adm = race->attackDataMap.get();
+		auto adm = (RE::BGSAttackDataMap*)race->attackDataMap.get();
 		auto attackData = (RE::BGSAttackData*)adm->attackDataMap.contains(eventName);
-		
+
 		if (!attackData) {
-			attackData = adm->attackDataMap.
+			RE::BGSAttackData *ptr = attackData;
+			RE::BSTSmartPointerIntrusiveRefCount<RE::BGSAttackData>::Acquire(ptr);
+			ptr->event = eventName;
+			eventName.c_str
+			// adm.insert(eventName, ptr);
+
+			// RE::BSTSmartPointerIntrusiveRefCount::IncRef<>(ptr)
+			// adm.insert(attackData->eventName, ptr)
 		}
 
-		if (attackData) {
-			SetAttackData(attackData, ev.second);
-		}
+		AttackAnimationArrayMap
+
+		// if (!attackData) {
+		// 	attackData = adm->attackDataMap.
+		// }
+
+		// if (attackData) {
+		// 	SetAttackData(attackData, ev.second);
+		// }
 
 		// RE::BGSAttackDataPtr
 
@@ -228,11 +241,11 @@ static void InitAttackDataJson()
 	std::string baseDir("Meshes\\AttackData");
 
 	// read json files
-    std::experimental::filesystem::v1::path p(std::string("Data\\") + baseDir);
-	std::for_each(std::experimental::filesystem::v1::directory_iterator(p), std::experimental::filesystem::v1::directory_iterator(),
-		[&baseDir](const std::experimental::filesystem::v1::path& p)
+    std::filesystem::path p(std::string("Data\\") + baseDir);
+	std::for_each(std::filesystem::directory_iterator(p), std::filesystem::directory_iterator(),
+		[&baseDir](const std::filesystem::path& p)
 	{
-		if (!std::experimental::filesystem::v1::is_regular_file(p))
+		if (!std::filesystem::is_regular_file(p))
 			return;
 
 		std::string ext = p.extension().string();
@@ -241,7 +254,7 @@ static void InitAttackDataJson()
 
 		std::string fileName = "Data\\" + baseDir + "\\" + p.filename().string();
 
-		_MESSAGE("found file %s", fileName.c_str());
+		
 		// read json
 		picojson::value val;
 		if (ParseJson(fileName, val))
@@ -295,7 +308,7 @@ bool HookedLoadForm(RE::TESRace * race, int64_t unk1)
 		auto it = s_setting.find(key);
 		if (it != s_setting.end())
 		{
-			InsertAttackDataRecords(race, it->second);
+			Settings::InsertAttackDataRecords(race, it->second);
 		}
 	}
 	
@@ -346,4 +359,41 @@ extern "C" {
 	}
 };
 
+RE::BGSAttackData *attackData = RE::NiTMallocInterface::Allocate<RE::BGSAttackData>();
+
 // == RE::AttackData::AttackFlag::kIgnoreWeapon);
+
+RE::BGSAttackData *RE::BGSAttackDataMap::Get(const RE::BSFixedString &eventName)
+{
+	auto iter = map.find(eventName);
+	return (iter != map.end()) ? iter->value : nullptr;
+}
+
+RE::BGSAttackData *RE::BGSAttackDataMap::Add(const RE::BSFixedString &eventName)
+{
+	RE::BSFixedString evName(eventName.c_str()); // refcount+1
+
+	
+
+	RE::BGSAttackData *ptr = RE::BGSAttackData::Create();
+	ptr->IncRef();
+	if (ptr)
+	{
+		ptr->eventName = evName;
+		map.insert(evName, ptr);
+	}
+
+	return ptr;
+}
+
+RE::BGSAttackData *RE::BGSAttackDataMap::Add(RE::BGSAttackData *attackData)
+{
+	if (attackData)
+	{
+		RE::BGSAttackData *ptr = attackData;
+
+		map.insert(attackData->eventName, ptr);
+	}
+
+	return attackData;
+}
