@@ -197,18 +197,25 @@ void Settings::InsertAttackDataRecords(RE::TESRace* race, event_map &events)
 		auto adm = (RE::BGSAttackDataMap*)race->attackDataMap.get();
 		auto attackData = (RE::BGSAttackData*)adm->attackDataMap.contains(eventName);
 
+		// RE::hkbBehaviorGraph* a_graph;
+		// RE::BSTHashMap<RE::BSFixedString, RE::NiPointer<RE::BGSAttackData>>;
+		// RE::BSTTuple<const key_type, mapped_type>
+		// <RE::BSFixedString, RE::BSFixedString, RE::BSTScatterTableTraits<RE::BSFixedString, RE::NiPointer<RE::BGSAttackData>>, RE::BSTScatterTableHeapAllocator>
+
+		// RE::BSTTuple<RE::BSFixedString, RE::BGSAttackData>
+
 		if (!attackData) {
 			RE::BGSAttackData *ptr = attackData;
-			RE::BSTSmartPointerIntrusiveRefCount<RE::BGSAttackData>::Acquire(ptr);
+			// RE::BSTSmartPointerIntrusiveRefCount<RE::BGSAttackData>::Acquire(ptr);
 			ptr->event = eventName;
-			eventName.c_str
+			attackData = adm->attackDataMap.insert(RE::BGSAttackDataMap::attackDataMap, eventName)
 			// adm.insert(eventName, ptr);
 
-			// RE::BSTSmartPointerIntrusiveRefCount::IncRef<>(ptr)
-			// adm.insert(attackData->eventName, ptr)
-		}
+		// 	// RE::BSTSmartPointerIntrusiveRefCount::IncRef<>(ptr)
+		// 	// adm.insert(attackData->eventName, ptr)
+		// }
 
-		AttackAnimationArrayMap
+		// AttackAnimationArrayMap
 
 		// if (!attackData) {
 		// 	attackData = adm->attackDataMap.
@@ -371,9 +378,16 @@ RE::BGSAttackData *RE::BGSAttackDataMap::Get(const RE::BSFixedString &eventName)
 
 RE::BGSAttackData *RE::BGSAttackDataMap::Add(const RE::BSFixedString &eventName)
 {
-	RE::BSFixedString evName(eventName.c_str()); // refcount+1
+	// using BSTHashMap = RE::BSTHashMap::BSTScatterTableHeapAllocator
 
 	
+
+	// template<size_t S, size_t A> inline RE::BSTScatterTableHeapAllocator<S, A>::BSTScatterTableHeapAllocator()
+
+
+	RE::BSFixedString evName(eventName.c_str()); // refcount+1
+
+	RE::BGSAttackData *attackData = 
 
 	RE::BGSAttackData *ptr = RE::BGSAttackData::Create();
 	ptr->IncRef();
