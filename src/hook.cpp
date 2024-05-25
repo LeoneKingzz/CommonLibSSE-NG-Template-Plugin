@@ -17,8 +17,8 @@ public:
     }
 
     RE::BSEventNotifyControl ProcessEvent(const RE::TESCombatEvent* event, RE::BSTEventSource<RE::TESCombatEvent>*) {
-        auto targetName = event->targetActor;
-        auto sourceName = event->actor;
+        decltype(auto) targetName = event->targetActor;
+        decltype(auto) sourceName = event->actor;
         auto Dragon = sourceName->As<RE::Actor>();
         const auto ActorTypeDragon = RE::BGSKeyword::LookupByEditorID("ActorTypeDragon")->As<RE::BGSKeyword>();
         auto UDDragonAISpell = RE::TESForm::LookupByEditorID<RE::SpellItem>("aaaUDDragonAISpell");
