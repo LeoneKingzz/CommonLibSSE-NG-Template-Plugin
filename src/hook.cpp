@@ -27,12 +27,12 @@ public:
         bool HasUDDragonAISpell = Dragon->HasSpell(UDDragonAISpell);
 
         if (!IsActorTypeDragon) {
-            RE::BSEventNotifyControl::kContinue;
+            return RE::BSEventNotifyControl::kContinue;
         }
         if (HasUDDragonAISpell) {
-            RE::BSEventNotifyControl::kContinue;
+            return RE::BSEventNotifyControl::kContinue;
         }
-        
+
         auto UDQuest = RE::TESForm::LookupByEditorID<RE::TESQuest>("aaaUDInitQuest");
 
         if (UDQuest) {
@@ -42,7 +42,7 @@ public:
                 Dragon->AddSpell(UDDragonAISpell);
             }
         }
-        RE::BSEventNotifyControl::kContinue;
+        return RE::BSEventNotifyControl::kContinue;
 
     }
 };
