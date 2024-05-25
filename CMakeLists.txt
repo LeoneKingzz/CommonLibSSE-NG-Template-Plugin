@@ -42,6 +42,12 @@ add_commonlibsse_plugin(${PROJECT_NAME} SOURCES ${headers} ${sources}) # <--- sp
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23) # <--- use C++23 standard
 target_precompile_headers(${PROJECT_NAME} PRIVATE src/PCH.h) # <--- PCH.h is required!
 
+#add_subdirectory("skse64")
+#add_subdirectory("libSkyrim")
+
+#target_link_libraries(UD64Plugin PRIVATE libSkyrim)
+#target_link_libraries(UD64Plugin PRIVATE skse64)
+
 target_include_directories(
 	"${PROJECT_NAME}"
 	PRIVATE

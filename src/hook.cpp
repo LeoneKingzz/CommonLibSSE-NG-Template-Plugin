@@ -29,7 +29,7 @@ public:
         if (!IsActorTypeDragon) {
             RE::BSEventNotifyControl::kContinue;
         }
-        if (!HasUDDragonAISpell) {
+        if (HasUDDragonAISpell) {
             RE::BSEventNotifyControl::kContinue;
         }
         
